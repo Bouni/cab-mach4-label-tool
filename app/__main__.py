@@ -15,8 +15,16 @@ BASEPATH = Path(os.path.join(os.path.abspath(os.path.dirname(__file__)))).parent
 
 class LabelTool:
     def __init__(self):
+        self.setup()
         self.labels = Labels(os.path.join(BASEPATH, "labels"))
         self.jobs = Jobs(os.path.join(BASEPATH, "jobs"))
+
+    @staticmethod
+    def setup():
+        """Create folders if they do not yet exist."""
+        Path(os.path.join(BASEPATH, "labels")).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(BASEPATH, "jobs")).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(BASEPATH, "output")).mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def calculate_label_settings(label):
