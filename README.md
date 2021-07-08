@@ -10,3 +10,4 @@ Maybe at some point in the future I add the ability to create and modify label s
 - Dockerize this thing
 - move from yaml files to a database for label and job storage, maybe sqlite or tinydb
 - make CRUD functionality for labels and jobs 
+- Add CSV import for labeljobs
