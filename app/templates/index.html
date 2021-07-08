@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container>
+                    <v-card color="blue darken-2">
+                        <v-card-title class="text-center justify-center py-6">
+                            <h1 class="font-weight-bold text-h2 blue-darken-2--text">
+                                Label Tool
+                            </h1>
+                        </v-card-title>
+                        <v-tabs v-model="tab" grow>
+                            <!--</v-tabs>background-color="transparent" color="blue darken-2" grow>-->
+                            <v-tab v-for="item in items" :key="item">
+                                {{ item }}
+                            </v-tab>
+                        </v-tabs>
+
+                        <v-tabs-items v-model="tab">
+                            <v-tab-item>
+                                <v-card flat>
+                                    <v-card-text>
+                                        <v-row>
+                                            <v-col v-for="(job, index) in jobs" cols="3">
+                                                <v-card class="ma-2 pa-2" outlined tile>
+                                                    <v-card-title>{{ job.name }}</v-card-title>
+                                                    <v-card-subtitle>
+                                                        <v-tooltip right>
+                                                            <template v-slot:activator="{ on, attrs }">
+                                                                <v-icon v-bind="attrs"
+                                                                v-on="on">
+                                                                    mdi-file-question-outline
+                                                                </v-icon>
+                                                            </template>
+                                                            <span>{{ job.path }}</span>
+                                                        </v-tooltip>
+                                                    </v-card-subtitle>
+                                                    <v-card-text>
+                                                        <v-row no-gutters>
+                                                            <v-col cols="6">Anzahl Etiketten:</v-col>
+                                                            <v-col cols="6">{{ job.labels.length }} ({{ total_label_count(job.labels) }} Total)</v-col>
+                                                            <v-col cols="6">Etikettentyp:</v-col>
+                                                            <v-col cols="6">{{ job.labeltype }}</v-col>
+                                                            <v-col cols="6">Abschnitt nach:</v-col>
+                                                            <v-col cols="6">{{ job.cutoff }} Reihen</v-col>
+                                                        </v-row>
+                                                    </v-card-text>
+                                                    <v-card-actions>
+                                                        <v-btn @click="load(job)">
+                                                            <v-icon large>mdi-printer</v-icon>Drucken
+                                                        </v-btn>
+                                                    </v-card-actions>
+                                                </v-card>
+                                            </v-col>
+                                        </v-row>
+                                    </v-card-text>
+                                </v-card>
+                            </v-tab-item>
+                            <v-tab-item>
+                                <v-row>
+                                    <v-col v-for="label in labels" cols="3">
+                                        <v-card class="ma-2 pa-2" outlined tile>
+                                            <v-card-title>{{ label.type }}</v-card-title>
+                                            <v-card-subtitle>{{ label.description }}</v-card-subtitle>
+                                            <v-card-text>
+                                                <v-row no-gutters>
+                                                    <v-col cols="6">Höhe:</v-col>
+                                                    <v-col cols="6">{{ label.height }}mm</v-col>
+                                                    <v-col cols="6">Breite:</v-col>
+                                                    <v-col cols="6">{{ label.width }}mm</v-col>
+                                                    <v-col cols="6">Anzahl pro Reihe:</v-col>
+                                                    <v-col cols="6">{{ label.quantity }}</v-col>
+                                                    <v-col cols="6">Druckgeschwindigkeit:</v-col>
+                                                    <v-col cols="6">{{ label.printspeed }}</v-col>
+                                                    <v-col cols="6">Temperatur:</v-col>
+                                                    <v-col cols="6">{{ label.temperature }}</v-col>
+                                                    <v-col cols="6">Horizontaler Spalt:</v-col>
+                                                    <v-col cols="6">{{ label.xgap }}mm</v-col>
+                                                    <v-col cols="6">Horizontaler Versatz:</v-col>
+                                                    <v-col cols="6">{{ label.xoffset }}</v-col>
+                                                    <v-col cols="6">Vertikaler Spalt:</v-col>
+                                                    <v-col cols="6">{{ label.ygap }}</v-col>
+                                                    <v-col cols="6">Vertikaler Versatz:</v-col>
+                                                    <v-col cols="6">{{ label.yoffset }}</v-col>
+                                                </v-row>
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                            </v-tab-item>
+                        </v-tabs-items>
+                    </v-card>
+                    <v-dialog v-model="dialog" width="500" persistent>
+                        <v-card>
+                            <v-card-title class="text-h5 grey lighten-2">
+                                {{ printjob.name }}
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-row v-for="label in printjob.labels">
+                                    <v-col cols="2">
+                                        <v-checkbox v-model="label.active"></v-checkbox>
+                                    </v-col>
+                                    <v-col cols="2">
+                                        <v-text-field v-model="label.quantity" class="mt-2 pt-2" type="number" style="width: 60px; height: 60px" min="0"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="8">
+                                        <v-card elevation="2" class="mt-5 text-center" style="min-height: 60px" v-html="getText(label)"></v-card>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+
+                            <v-divider></v-divider>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="red" text @click="dialog = false">
+                                    Abbrechen
+                                </v-btn>
+                                <v-btn color="primary" text @click="print()">
+                                    Drucken
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                tab: null,
+                items: [
+                    'Jobs', 'Labels',
+                ],
+                labels: {},
+                jobs: [],
+                dialog: false,
+                printjob: {}
+
+            },
+            methods: {
+                total_label_count: function(labels) {
+                    var count = 0
+                    labels.forEach(label => count += parseInt(label.quantity));
+                    return count
+                },
+                load: function(job) {
+                    this.printjob = job
+                    this.printjob.labels.forEach(label => label.active = true)
+                    this.dialog = true
+                },
+                getText: function(label, index) {
+                    text = []
+                    label.lines.forEach(line => text.push(line.text))
+                    return text.join("<br/>")
+                },
+                print: function() {
+                    const requestOptions = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(this.printjob)
+                    };
+                    fetch("http://localhost:5000/print", requestOptions)
+                        .then(response => response.json())
+                    this.dialog = false
+                    this.printjob = {}
+                }
+            },
+            mounted: function() {
+                fetch("http://localhost:5000/labels")
+                    .then(response => response.json())
+                    .then(data => (this.labels = data.labels));
+                fetch("http://localhost:5000/jobs")
+                    .then(response => response.json())
+                    .then(data => (this.jobs = data.jobs));
+            }
+        })
+    </script>
+</body>
+
+</html>

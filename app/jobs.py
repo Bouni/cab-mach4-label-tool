@@ -17,6 +17,7 @@ class Line(BaseModel):
 class Lines(BaseModel):
     lines: List[Line]
     quantity: int
+    active: Optional[bool]
 
 
 class Job(BaseModel):

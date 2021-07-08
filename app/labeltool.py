@@ -93,6 +93,8 @@ class LabelTool:
         labelcounter = 0
         labels = []
         for label in job.labels:
+            if not label.active:
+                continue
             for l in range(0, label.quantity):
                 labels.append(
                     self.calculate_label_position(labeltype, label, labelcounter)
@@ -108,16 +110,10 @@ class LabelTool:
         """Generate file name for print file."""
         return f"{dt.now().strftime('%Y-%m-%d-%H-%M-%S')}-{job.name}.txt"
 
-    def generate_print_file(self, job_id):
+    def generate_print_file(self, job):
         """Generate the printfile that is sent to the printer."""
-        # Exit if no valid job id is passed in
-        if len(self.jobs.joblist) < job_id:
-            logger.error("Invalid job ID %s", job_id)
-            return
-        job = self.jobs.joblist[job_id]
-        # Exit if labeltype defined in job is not in loaded labeltypes
         if not job.labeltype in self.labels.labels:
-            logger.error("Invalid label type %s for job ID %s", job.labeltype, job_id)
+            logger.error("Invalid label type %s for job ID %s", job.labeltype, job.name)
             return
         labeltype = self.labels.labels[job.labeltype]
 
@@ -126,27 +122,33 @@ class LabelTool:
         label_end = False
         printfile = os.path.join(BASEPATH, "output", self.filename(job))
         with open(printfile, "w") as f:
+            # Add comment as a header just once
             f.write(self.comment(job))
-            for label in self.calculate_labels(job, labeltype):
-                label_end = False
+            # get labels with their calculated positions
+            labels = self.calculate_labels(job, labeltype)
+            # loop over all the labels
+            for n, label in enumerate(labels, 1):
+                # determin if the last label is reached
+                last_label = len(labels) == n
+                # If we are at first label of a row, start a new label
                 if xcounter == 0:
                     f.write(self.jobname(job))
                     f.write(self.print_speed_temperature(labeltype))
                     f.write(self.calculate_label_settings(labeltype))
                     f.write(self.options())
+                # add all the lines, which is equal to all the labels of a row
                 for line in label:
                     f.write(line)
                 xcounter += 1
-                if xcounter == labeltype.quantity:
+
+                # If all labels of a row or the last label of a set is processed
+                if xcounter == labeltype.quantity or last_label:
                     ycounter += 1
-                    if ycounter == job.cutoff:
+                    # add cut if cut off setting or last label is reached
+                    if ycounter == job.cutoff or last_label:
                         f.write(self.cutter())
                     f.write(self.labelcount())
                     xcounter = 0
-                    label_end = True
-            if not label_end:
-                f.write(self.cutter())
-                f.write(self.labelcount())
         return printfile
 
     @staticmethod
@@ -156,9 +158,3 @@ class LabelTool:
         ftp.cwd("execute")
         with open(path, "rb") as f:
             ftp.storbinary("STOR job.txt", f)
-
-
-if __name__ == "__main__":
-    lt = LabelTool()
-    f = lt.generate_print_file(1)
-    lt.send_printfile(f)
