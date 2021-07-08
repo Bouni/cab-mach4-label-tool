@@ -18,6 +18,10 @@
                             <h1 class="font-weight-bold text-h2 blue-darken-2--text">
                                 Label Tool
                             </h1>
+                            <v-spacer></v-spacer>
+                            <v-btn color="green" fab dark @click="reload">
+                                <v-icon large>mdi-reload</v-icon>
+                            </v-btn>
                         </v-card-title>
                         <v-tabs v-model="tab" grow>
                             <!--</v-tabs>background-color="transparent" color="blue darken-2" grow>-->
@@ -104,6 +108,10 @@
                         <v-card>
                             <v-card-title class="text-h5 grey lighten-2">
                                 {{ printjob.name }}
+                                <v-spacer></v-spacer>
+                                <v-btn color="red" icon dark small @click="dialog = false">
+                                    <v-icon large>mdi-close</v-icon>
+                                </v-btn>
                             </v-card-title>
 
                             <v-card-text>
@@ -156,6 +164,12 @@
 
             },
             methods: {
+                reload: async function() {
+                    await fetch("http://localhost:5000/reload").then(response => response.json())
+                    await fetch("http://localhost:5000/labels").then(response => response.json()).then(data => (this.labels = data.labels))
+                    await fetch("http://localhost:5000/jobs").then(response => response.json()).then(data => (this.jobs = data.jobs))
+                },
+
                 total_label_count: function(labels) {
                     var count = 0
                     labels.forEach(label => count += parseInt(label.quantity));

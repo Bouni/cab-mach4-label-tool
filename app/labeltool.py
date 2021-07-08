@@ -16,6 +16,9 @@ BASEPATH = Path(os.path.join(os.path.abspath(os.path.dirname(__file__)))).parent
 class LabelTool:
     def __init__(self):
         self.setup()
+        self.load_data()
+
+    def load_data(self):
         self.labels = Labels(os.path.join(BASEPATH, "labels"))
         self.jobs = Jobs(os.path.join(BASEPATH, "jobs"))
 
@@ -119,7 +122,6 @@ class LabelTool:
 
         xcounter = 0
         ycounter = 0
-        label_end = False
         printfile = os.path.join(BASEPATH, "output", self.filename(job))
         with open(printfile, "w") as f:
             # Add comment as a header just once

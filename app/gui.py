@@ -28,6 +28,12 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/reload")
+def reload():
+    labeltool.load_data()
+    return jsonify(True)
+
+
 @app.route("/labels")
 def labels():
     labels = {
