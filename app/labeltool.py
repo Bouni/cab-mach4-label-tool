@@ -126,31 +126,33 @@ class LabelTool:
         with open(printfile, "w") as f:
             # Add comment as a header just once
             f.write(self.comment(job))
-            # get labels with their calculated positions
-            labels = self.calculate_labels(job, labeltype)
-            # loop over all the labels
-            for n, label in enumerate(labels, 1):
-                # determin if the last label is reached
-                last_label = len(labels) == n
-                # If we are at first label of a row, start a new label
-                if xcounter == 0:
-                    f.write(self.jobname(job))
-                    f.write(self.print_speed_temperature(labeltype))
-                    f.write(self.calculate_label_settings(labeltype))
-                    f.write(self.options())
-                # add all the lines, which is equal to all the labels of a row
-                for line in label:
-                    f.write(line)
-                xcounter += 1
+            for i in range(0, job.quantity):
+                # get labels with their calculated positions
+                labels = self.calculate_labels(job, labeltype)
+                # loop over all the labels
+                for n, label in enumerate(labels, 1):
+                    # determin if the last label is reached
+                    last_label = len(labels) == n
+                    # If we are at first label of a row, start a new label
+                    if xcounter == 0:
+                        f.write(self.jobname(job))
+                        f.write(self.print_speed_temperature(labeltype))
+                        f.write(self.calculate_label_settings(labeltype))
+                        f.write(self.options())
+                    # add all the lines, which is equal to all the labels of a row
+                    for line in label:
+                        f.write(line)
+                    xcounter += 1
 
-                # If all labels of a row or the last label of a set is processed
-                if xcounter == labeltype.quantity or last_label:
-                    ycounter += 1
-                    # add cut if cut off setting or last label is reached
-                    if ycounter == job.cutoff or last_label:
-                        f.write(self.cutter())
-                    f.write(self.labelcount())
-                    xcounter = 0
+                    # If all labels of a row or the last label of a set is processed
+                    if xcounter == labeltype.quantity or last_label:
+                        ycounter += 1
+                        # add cut if cut off setting or last label is reached
+                        if ycounter == job.cutoff or last_label:
+                            ycounter = 0
+                            f.write(self.cutter())
+                        f.write(self.labelcount())
+                        xcounter = 0
         return printfile
 
     @staticmethod

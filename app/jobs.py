@@ -25,6 +25,7 @@ class Job(BaseModel):
     path: str
     labeltype: str
     cutoff: int
+    quantity: Optional[int]
     labels: List[Lines]
 
 

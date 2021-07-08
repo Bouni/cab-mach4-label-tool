@@ -115,6 +115,24 @@
                             </v-card-title>
 
                             <v-card-text>
+                                <v-row>
+                                    <v-col cols="2">
+                                        <v-btn class="mt-4" color="purple" icon dark small @click="swap_active">
+                                            <v-icon large>mdi-swap-horizontal</v-icon>
+                                        </v-btn>
+                                    </v-col>
+                                    <v-col cols="2">
+                                        <v-text-field v-model="printjob.quantity" class="mt-2 pt-2" type="number" style="width: 60px; height: 60px" min="1"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="8">
+                                        <v-btn class="mt-4 float-right" color="primary" text @click="print()">
+                                            <v-icon>mdi-printer</v-icon> Drucken
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+
+                                <v-divider></v-divider>
+
                                 <v-row v-for="label in printjob.labels">
                                     <v-col cols="2">
                                         <v-checkbox v-model="label.active"></v-checkbox>
@@ -128,17 +146,6 @@
                                 </v-row>
                             </v-card-text>
 
-                            <v-divider></v-divider>
-
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="red" text @click="dialog = false">
-                                    Abbrechen
-                                </v-btn>
-                                <v-btn color="primary" text @click="print()">
-                                    Drucken
-                                </v-btn>
-                            </v-card-actions>
                         </v-card>
                     </v-dialog>
                 </v-container>
@@ -160,7 +167,7 @@
                 labels: {},
                 jobs: [],
                 dialog: false,
-                printjob: {}
+                printjob: {},
 
             },
             methods: {
@@ -169,14 +176,17 @@
                     await fetch("http://localhost:5000/labels").then(response => response.json()).then(data => (this.labels = data.labels))
                     await fetch("http://localhost:5000/jobs").then(response => response.json()).then(data => (this.jobs = data.jobs))
                 },
-
                 total_label_count: function(labels) {
                     var count = 0
                     labels.forEach(label => count += parseInt(label.quantity));
                     return count
                 },
+                swap_active: function() {
+                    this.printjob.labels.forEach(label => label.active = !label.active)
+                },
                 load: function(job) {
                     this.printjob = job
+                    this.printjob.quantity = 1
                     this.printjob.labels.forEach(label => label.active = true)
                     this.dialog = true
                 },
@@ -186,6 +196,16 @@
                     return text.join("<br/>")
                 },
                 print: function() {
+                    count = 0
+                    this.printjob.labels.forEach(label => {
+                        if (label.active) {
+                            count += parseInt(label.quantity)
+                        }
+                    })
+                    if (count <= 0) {
+                        this.dialog = false
+                        return
+                    }
                     const requestOptions = {
                         method: "POST",
                         headers: {
