@@ -137,9 +137,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# YAML files
-*.yml
-*.yaml
-
-# Output files
+# job, label and output files
+jobs
+labels
 output
