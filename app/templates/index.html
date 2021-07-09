@@ -172,9 +172,9 @@
             },
             methods: {
                 reload: async function() {
-                    await fetch("http://localhost:5000/reload").then(response => response.json())
-                    await fetch("http://localhost:5000/labels").then(response => response.json()).then(data => (this.labels = data.labels))
-                    await fetch("http://localhost:5000/jobs").then(response => response.json()).then(data => (this.jobs = data.jobs))
+                    await fetch("reload").then(response => response.json())
+                    await fetch("labels").then(response => response.json()).then(data => (this.labels = data.labels))
+                    await fetch("jobs").then(response => response.json()).then(data => (this.jobs = data.jobs))
                 },
                 total_label_count: function(labels) {
                     var count = 0
@@ -213,17 +213,17 @@
                         },
                         body: JSON.stringify(this.printjob)
                     };
-                    fetch("http://localhost:5000/print", requestOptions)
+                    fetch("print", requestOptions)
                         .then(response => response.json())
                     this.dialog = false
                     this.printjob = {}
                 }
             },
             mounted: function() {
-                fetch("http://localhost:5000/labels")
+                fetch("labels")
                     .then(response => response.json())
                     .then(data => (this.labels = data.labels));
-                fetch("http://localhost:5000/jobs")
+                fetch("jobs")
                     .then(response => response.json())
                     .then(data => (this.jobs = data.jobs));
             }

@@ -156,7 +156,10 @@ class LabelTool:
         return printfile
 
     @staticmethod
-    def send_printfile(path, ip="192.168.3.53", user="root", pin="0000"):
+    def send_printfile(path):
+        ip = os.environ.get('CAB_HOST')
+        user = os.environ.get('CAB_USER')
+        pin = os.environ.get('CAB_PIN')
         ftp = FTP(ip)
         ftp.login(user, pin, "")
         ftp.cwd("execute")
