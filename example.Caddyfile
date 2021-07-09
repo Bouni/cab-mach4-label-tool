@@ -1,0 +1,13 @@
+{
+    admin off
+}
+
+http://labeltool.bouni.de {
+    redir /labeltool /labeltool/
+    route /labeltool/* {
+        uri strip_prefix /labeltool
+        reverse_proxy labeltool:5000
+    }
+    log
+}
+

@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  caddy:
+    container_name: caddy
+    image: caddy
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    restart: unless-stopped
+    ports:
+      - "80:80"
+
+  labeltool:
+    container_name: labeltool
+    build: ./labeltool
+    image: labeltool
+    ports:
+      - 5000:5000
+    env_file:
+        - ./labeltool/.env
+    volumes:
+      - ./labeltool/jobs:/jobs
+      - ./labeltool/labels:/labels
+      - ./labeltool/output:/output
+    depends_on:
+      - caddy
+    restart: always
+    command: gunicorn --bind 0.0.0.0:5000 gui:app --access-logfile '-'
