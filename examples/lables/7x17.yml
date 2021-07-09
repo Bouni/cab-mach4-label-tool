@@ -1,0 +1,13 @@
+---
+type: 7x17
+description: 7x17 Etiketten
+quantity: 5
+width: 17
+xgap: 1.5
+height: 7
+ygap: 2
+xoffset: 0
+yoffset: 0
+printspeed: 50
+temperature: 6
+

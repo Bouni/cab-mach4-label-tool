@@ -1,0 +1,23 @@
+---
+name: Example label set
+labeltype: 7x17
+cutoff: 10
+labels:
+  - lines:
+      - size: 3
+        text: "-Q1"
+      - size: 2.5
+        text: "Mains switch"
+    quantity: 1
+  - lines:
+      - size: 4
+        text: "-X1"
+    quantity: 1
+  - lines:
+      - size: 3
+        text: "-X2"
+      - size: 2.5
+        text: "24VDC"
+      - size: 2
+        text: "Danger!"
+    quantity: 10

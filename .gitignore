@@ -138,6 +138,6 @@ dmypy.json
 cython_debug/
 
 # job, label and output files
-jobs
-labels
-output
+/jobs/
+/labels/
+/output/
