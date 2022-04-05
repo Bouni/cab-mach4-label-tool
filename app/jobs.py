@@ -9,9 +9,9 @@ logger = logging.getLogger("jobs")
 
 
 class Line(BaseModel):
-    size: int
+    size: float
     text: str
-    yoffset: Optional[int]
+    yoffset: Optional[float]
 
 
 class Lines(BaseModel):
