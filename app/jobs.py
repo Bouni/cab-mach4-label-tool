@@ -22,7 +22,7 @@ class Lines(BaseModel):
 
 class Job(BaseModel):
     name: str
-    category: str = "Diverse"
+    category: str = "zzzDiverse"
     path: str
     labeltype: str
     cutoff: int
@@ -40,7 +40,7 @@ class Jobs:
 
     def load_jobs(self):
         for root, dirs, files in os.walk(self.path):
-            for file in files:
+            for file in sorted(files):
                 if file.endswith(".yml"):
                     self.process_jobs(os.path.join(root, file))
 
