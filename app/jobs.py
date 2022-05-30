@@ -22,6 +22,7 @@ class Lines(BaseModel):
 
 class Job(BaseModel):
     name: str
+    category: str = "Diverse"
     path: str
     labeltype: str
     cutoff: int
